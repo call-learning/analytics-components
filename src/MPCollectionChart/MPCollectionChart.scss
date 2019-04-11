@@ -1,0 +1,19 @@
+.table th, .table td {
+  word-wrap: break-word;
+}
+
+.table th .collection-date {
+  writing-mode: vertical-lr;
+  text-orientation: sideways;
+}
+
+.selected-students {
+  fill: red;
+  elevation: 1;
+}
+.all-students {
+  fill: blue;
+}
+.no-students {
+  fill: darkgray;
+}
