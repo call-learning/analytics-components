@@ -1,4 +1,4 @@
-import MPCollectionChart as './MPCollectionChart';
+import MPCollectionChart from './MPCollectionChart';
 
 export {
     MPCollectionChart

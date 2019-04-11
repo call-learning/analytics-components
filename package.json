@@ -1,12 +1,12 @@
 {
-  "name": "@moocpilot/components",
+  "name": "@analytics/components",
   "version": "0.0.0-development",
   "description": "Accessible front end components for edX Analytics.",
   "main": "dist/analytics-components.js",
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
-    "url": "https://github.com/call-learning/moocpilot-compoents.git"
+    "url": "https://github.com/call-learning/analytics-components.git"
   },
   "files": [
     "/dist",
@@ -96,7 +96,7 @@
     "storybook-readme": "^4.0.5",
     "style-loader": "^0.23.1",
     "travis-deploy-once": "^5.0.11",
-    "uglifyjs-webpack-plugin": "^2.1.2",
+    "terser-webpack-plugin": "^1.2.3",
     "webpack": "^4.29.6",
     "webpack-cli": "^3.3.0",
     "@storybook/addon-links": "^5.0.5",
@@ -124,17 +124,11 @@
       "/tests/"
     ],
     "transformIgnorePatterns": [
-      "/node_modules/(?!(@moocpilot/components)/).*/"
+      "/node_modules/(?!(@analytics/components)/).*/"
     ]
   },
   "browserslist": [
     "last 2 versions",
     "not ie < 11"
-  ],
-  "husky": {
-    "hooks": {
-      "commit-msg": "commitlint -e $GIT_PARAMS",
-      "pre-commit": "npm run lint"
-    }
-  }
+  ]
 }

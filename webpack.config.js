@@ -1,5 +1,5 @@
 const path = require('path');
-const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
+const TerserPlugin = require('terser-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 
@@ -31,8 +31,10 @@ module.exports = {
             root: 'ReactDOM',
         },
     },
+    optimization: {
+        minimizer: [new TerserPlugin()]
+    },
     plugins: [
-        new UglifyJsPlugin(),
         new MiniCssExtractPlugin({
             filename: 'analytics-components.min.css',
         }),
@@ -60,9 +62,7 @@ module.exports = {
                     {
                         loader: 'sass-loader',
                         options: {
-                            data: '@import "bootstrap-variables";',
                             includePaths: [
-                                path.join(__dirname, './src/utils'),
                                 path.join(__dirname, './node_modules'),
                             ],
                         },
