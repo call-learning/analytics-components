@@ -20,10 +20,11 @@ module.exports = {
           {
             loader: 'sass-loader',
             options: {
+              data: '@import "index";',
               includePaths: [
+                path.join(__dirname, '../src/'),
                 path.join(__dirname, '../node_modules'),
               ],
-              sourceMap: true,
             },
           },
         ],

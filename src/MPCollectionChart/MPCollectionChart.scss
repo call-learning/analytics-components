@@ -3,17 +3,30 @@
 }
 
 .table th .collection-date {
-  writing-mode: vertical-lr;
-  text-orientation: sideways;
+
 }
 
 .selected-students {
   fill: red;
   elevation: 1;
 }
+
+g.text-label rect {
+  fill: white;
+  stroke: white;
+}
+g.text-label text {
+  font-size: 18px;
+  font-family: sans-serif;
+  fill: black;
+  text-anchor:middle;
+  dominant-baseline: text-before-edge;
+}
+
 .all-students {
   fill: blue;
 }
+
 .no-students {
   fill: darkgray;
 }

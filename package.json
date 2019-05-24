@@ -1,7 +1,7 @@
 {
-  "name": "@analytics/components",
+  "name": "@moocpilot/analytics-components",
   "version": "0.0.0-development",
-  "description": "Accessible front end components for edX Analytics.",
+  "description": "Accessible front end components for edX Analytics/MOOC Pilot.",
   "main": "dist/analytics-components.js",
   "license": "Apache-2.0",
   "repository": {
@@ -28,16 +28,21 @@
     "start": "start-storybook -p 6006",
     "test": "jest --coverage",
     "travis-deploy-once": "travis-deploy-once",
-    "storybook": "start-storybook -p 6006"
+    "storybook": "start-storybook -p 6006 -s ./tests/data",
+    "analyze-bundle": "webpack --mode production --config=webpack.config.js --profile --json > stats.json",
+    "analyze-display": "webpack-bundle-analyzer stats.json"
   },
   "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "^1.2.18",
+    "@fortawesome/free-solid-svg-icons": "^5.8.2",
+    "@fortawesome/react-fontawesome": "^0.1.4",
+    "react": "^16.8.6",
+    "react-dom": "^16.8.6",
+    "react-proptype-conditional-require": "^1.0.4",
     "classnames": "^2.2.6",
     "font-awesome": "^4.7.0",
     "prop-types": "^15.7.2",
-    "react": "^16.8.4",
-    "react-dom": "^16.8.4",
-    "react-proptype-conditional-require": "^1.0.4",
-    "react-responsive": "^6.1.1",
+    "@edx/paragon": "^4.2.6",
     "sanitize-html": "^1.20.0",
     "d3-array": "^2.0.3",
     "d3-axis": "^1.0.12",
@@ -100,7 +105,8 @@
     "webpack": "^4.29.6",
     "webpack-cli": "^3.3.0",
     "@storybook/addon-links": "^5.0.5",
-    "@storybook/addons": "^5.0.5"
+    "@storybook/addons": "^5.0.5",
+    "webpack-bundle-analyzer": "^3.3.2"
   },
   "jest": {
     "transform": {
@@ -124,7 +130,7 @@
       "/tests/"
     ],
     "transformIgnorePatterns": [
-      "/node_modules/(?!(@analytics/components)/).*/"
+      "/node_modules/(?!(@moocpilit/analytics-components)/).*/"
     ]
   },
   "browserslist": [

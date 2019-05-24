@@ -1,5 +1,11 @@
+@import "~font-awesome/css/font-awesome.min.css";
+@import "~@edx/edx-bootstrap/sass/edx/theme";
 @import "../src/index.scss";
-
 table {
   @extend .table !optional;
+}
+#story-root caption {
+  caption-side: top;
+  text-align: center;
+  font-weight: bolder;
 }

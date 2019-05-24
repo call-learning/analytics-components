@@ -1,135 +1,216 @@
 import React from 'react';
 import classNames from 'classnames';
 import PropTypes from 'prop-types';
-import {group, rollup, max} from 'd3-array';
+import { group, rollup, max } from 'd3-array';
 import MPCollectionRow from './MCollectionRow';
+import StudentsList from '../StudentsList';
 
 /**
  *
+ *
  */
 class MPCollectionChart extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            selectedStudents: this.props.selectedStudents
-        };
-        this.handleStudentSelectionChange = this.handleStudentSelectionChange.bind(this);
-    }
-
-    getCaption() {
-        return this.props.caption && (
-            <caption>{this.props.caption}</caption>
-        );
-    }
-
-    handleStudentSelectionChange(studentList) {
-        if (this.props.onStudentSelectionChange) {
-            this.props.onStudentSelectionChange(studentList)
+  constructor(props) {
+    super(props);
+    this.state = {
+      selectedStudents: this.props.selectedStudents,
+      processedGrades: null,
+      studentlist: false,
+    };
+    this.handleStudentSelectionChange = this.handleStudentSelectionChange.bind(this);
+    this.displayStudentList = this.displayStudentList.bind(this);
+    this.closeStudentList = this.closeStudentList.bind(this);
+    // We take the grade processing out of the main thread
+    const processgrades = new Promise((resolve) => {
+      // We need to extract the changing grades week per week, so we only get additional changes
+      // Collection per collection
+      const filteredgradelist = this.props.grades.reduce(
+        (gradeset, currentgrade) => {
+          const gradesetforstudent = gradeset.get(currentgrade.studentid);
+          if (gradesetforstudent) {
+            const hasgradechanged =
+              gradesetforstudent.find(prevgrade =>
+                (prevgrade.studentid === currentgrade.studentid) &&
+                (prevgrade.activityid === currentgrade.activityid) &&
+                (prevgrade.value !== currentgrade.value));
+            if (hasgradechanged) {
+              gradesetforstudent.push(currentgrade);
+            }
+          } else {
+            gradeset.set(currentgrade.studentid, [currentgrade]);
+          }
+          return gradeset;
         }
-        this.setState({selectedStudents: studentList});
-    }
+        , new Map(),
+      );
 
-    getHeadings() {
-        return (
-            <thead
-                className={classNames(this.props.headingClassName)}>
-            <tr>
-                <th key="col-start" scope="col"/>
-                <th key="activity" scope="col"/>
-                {
-                    this.props.collections.map(
-                        (currentCollection, index) =>
-                            <th key={index} scope="col">
-                                <div>{index}</div>
-                                <div className="collection-date">{currentCollection.filedate}</div>
-                            </th>
-                    )
-                }
-            </tr>
-            </thead>
+      const gradeset = Array.from(filteredgradelist.values())
+        .flat();
+      // We sort the grade per first collection id
+      const gradesPerFirstCollection = group(
+        gradeset,
+        g => this.props.students.find(s => g.studentid === s.id).firstactivecollection,
+        // First  index is first the collection Id
+      );
+      /* Then we sort get a mapping between the first collection id => the collection id
+       and the number of grades */
+      const gradeCollectionRoll =
+        rollup(
+          gradeset,
+          g => g.length,
+          // First the FIRST collection Id
+          g => this.props.students.find(s => g.studentid === s.id).firstactivecollection,
+          g => g.collectionid, // Then by collection id first
         );
-    }
+      resolve({
+        gradesPerFirstCollection,
+        gradeCollectionRoll,
+      });
+    });
+    processgrades.then((value) => {
+      this.setState({
+        processedGrades: value,
+      });
+    });
+  }
 
-    getBody() {
-        const gradesPerFirstCollection = group(this.props.grades,
-            g => this.props.students[g.studentid].firstactivecollection, // First  index is first the collection Id
-        );
-        const gradeCollectionRoll =
-            rollup(this.props.grades,
-                g => g.length,
-                g => this.props.students[g.studentid].firstactivecollection, // First the FIRST collection Id
-                g => g.collectid // Then by collection id first
-            );
+  getCaption() {
+    return this.props.caption && (
+      <caption>{this.props.caption}</caption>
+    );
+  }
 
-        const maxGradesCount = max(gradeCollectionRoll.values(),
-            gcol => max(gcol.values())
-        );// Extract the max value from each submap
-        let allrows = [];
-        gradesPerFirstCollection.forEach((grades, firstCollection) => {
-            allrows.push(<MPCollectionRow
-                key={firstCollection} name={firstCollection} grades={grades}
-                allcolumns={this.props.collections}
-                studentSelection={this.state.selectedStudents}
-                onStudentSelectionChange={this.handleStudentSelectionChange}
-                maxGradesCount={maxGradesCount}
-            />);
-        });
-        return (
-            <tbody>
-            {allrows}
-            </tbody>
-        )
+  handleStudentSelectionChange(studentList) {
+    if (this.props.onStudentSelectionChange) {
+      this.props.onStudentSelectionChange(studentList);
     }
+    this.setState({ selectedStudents: studentList });
+  }
 
-    render() {
-        return (
-            <table className={classNames(
-                'table',
-                this.props.className,
-            )}
-            >
-                {this.getCaption()}
-                {this.getHeadings()}
-                {this.getBody()}
-            </table>
-        );
+  getHeadings() {
+    return (
+      <thead
+        className={classNames(this.props.headingClassName)}
+      >
+        <tr>
+          <th key="col-start" scope="col" />
+          <th key="activity" scope="col" />
+          <th key="total" scope="col">Total</th>
+          {
+          this.props.collections.map((currentCollection, index) =>
+            (<th key={index} scope="col">
+              <div>{`C${index}`}</div>
+              <div
+                className="collection-date"
+              >{(new Date(currentCollection.timestamp)).toLocaleDateString()}
+              </div>
+            </th>))
+        }
+        </tr>
+      </thead>
+    );
+  }
+
+  getTable() {
+    if (!this.state.processedGrades) {
+      return (<p>Processing ....</p>);
     }
+    const maxGradesCount = max(
+      this.state.processedGrades.gradesPerFirstCollection.values(),
+      gcol => gcol.length,
+    );// Extract the max value from each submap
+    const allrows = [];
+    this.state.processedGrades.gradesPerFirstCollection.forEach((grades, firstCollection) => {
+      allrows.push(<MPCollectionRow
+        key={`mpcollrow-${firstCollection}`}
+        name={Number(firstCollection)
+            .toString()}
+        grades={grades}
+        activities={this.props.activities}
+        allcolumns={this.props.collections}
+        students={this.props.students}
+        studentSelection={this.state.selectedStudents}
+        onStudentSelectionChange={this.handleStudentSelectionChange}
+        onDisplayStudentList={this.displayStudentList}
+        maxGradesCount={maxGradesCount}
+      />);
+    });
+
+    return (
+      <table className={classNames(
+        'table',
+        this.props.className,
+      )}
+      >
+        {this.getCaption()}
+        {this.getHeadings()}
+        <tbody>
+          {allrows}
+        </tbody>
+      </table>
+    );
+  }
+
+  render() {
+    if (this.state.studentlist) {
+      return (
+        <StudentsList
+          students={this.props.students}
+          studentSelection={this.state.studentlist}
+          collections={this.props.collections}
+          onClose={this.closeStudentList}
+        />
+      );
+    }
+    return this.getTable();
+  }
+
+  closeStudentList() {
+    this.setState({ studentlist: false });
+  }
+
+  displayStudentList(studentlist) {
+    this.setState({ studentlist });
+  }
 }
 
 MPCollectionChart.propTypes = {
-    caption: PropTypes.oneOfType([
-        PropTypes.string,
-        PropTypes.element,
-    ]),
-    className: PropTypes.string,
-    collections: PropTypes.arrayOf(
-        PropTypes.shape({
-            filename: PropTypes.string,
-            filedate: PropTypes.string
-        })).isRequired,
-    grades: PropTypes.arrayOf(
-        PropTypes.shape({
-            studentid: PropTypes.number,
-            name: PropTypes.string,
-            value: PropTypes.number,
-            filedate: PropTypes.string,
-            collectid: PropTypes.number
-        })).isRequired,
-    students: PropTypes.objectOf(
-        PropTypes.shape({
-            username: PropTypes.string,
-            id: PropTypes.number,
-            cohort: PropTypes.string,
-            firstactivecollection: PropTypes.number
-        })).isRequired,
-    headingClassName: PropTypes.arrayOf(PropTypes.string),
-    rowHeaderColumnKey: PropTypes.string,
+  caption: PropTypes.oneOfType([
+    PropTypes.string,
+    PropTypes.element,
+  ]),
+  className: PropTypes.string,
+  collections: PropTypes.arrayOf(PropTypes.shape({
+    id: PropTypes.number,
+    filename: PropTypes.string,
+    timestamp: PropTypes.number,
+  })).isRequired,
+  grades: PropTypes.arrayOf(PropTypes.shape({
+    studentid: PropTypes.number,
+    activityid: PropTypes.number,
+    value: PropTypes.number,
+    collectionid: PropTypes.number,
+    cohort: PropTypes.string,
+  })).isRequired,
+  students: PropTypes.arrayOf(PropTypes.shape({
+    username: PropTypes.string,
+    id: PropTypes.number,
+    cohort: PropTypes.string,
+    firstactivecollection: PropTypes.number,
+  })).isRequired,
+  activities: PropTypes.arrayOf(PropTypes.shape({
+    id: PropTypes.number,
+    name: PropTypes.string,
+  })).isRequired,
+  onStudentSelectionChange: PropTypes.func,
+  headingClassName: PropTypes.arrayOf(PropTypes.string),
 };
 
 MPCollectionChart.defaultProps = {
-    caption: null,
-    className: undefined,
-    headingClassName: [],
+  caption: null,
+  className: undefined,
+  headingClassName: [],
+  onStudentSelectionChange: null,
 };
 
 
