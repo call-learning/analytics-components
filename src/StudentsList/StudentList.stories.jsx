@@ -9,6 +9,11 @@ import { grades as gradesData } from './../../tests/data/grades.data';
 storiesOf('StudentList', module)
   .addParameters({ info: { text: README } })
   .add('Basic', () => (
-    <StudentList students={gradesData.students} studentSelection={[151, 201]} collections={gradesData.collections} />
+    <StudentList
+      students={gradesData.students}
+      studentSelection={[151, 201]}
+      collections={gradesData.collections}
+      cohorts={gradesData.cohorts}
+    />
   ));
 

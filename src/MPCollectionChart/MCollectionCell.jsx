@@ -45,6 +45,7 @@ class MPCollectionCell extends React.Component {
         cy={cellSize / 2}
         r={scale(grades.length)}
         className="all-students"
+        key='outer-circle'
       />);
       if (selectedGrades.length > 0) {
         svgCircle.push(<circle
@@ -52,6 +53,7 @@ class MPCollectionCell extends React.Component {
           cy={cellSize / 2}
           r={scale(selectedGrades.length)}
           className="selected-students"
+          key='inner-circle'
         />);
       }
     }
@@ -98,12 +100,12 @@ MPCollectionCell.propTypes = {
     activityid: PropTypes.number,
     value: PropTypes.number,
     collectionid: PropTypes.number,
-    cohort: PropTypes.string,
+    cohort: PropTypes.number,
   })),
   students: PropTypes.arrayOf(PropTypes.shape({
     username: PropTypes.string,
     id: PropTypes.number,
-    cohort: PropTypes.string,
+    cohorts: PropTypes.arrayOf(PropTypes.number),
     firstactivecollection: PropTypes.number,
   })).isRequired,
   studentSelection: PropTypes.arrayOf(PropTypes.number),

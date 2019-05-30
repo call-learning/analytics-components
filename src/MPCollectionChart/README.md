@@ -19,13 +19,13 @@ collection is an object with the following properties.
 - activityid: activity identified as in the activity array/table
 - value: value of the grade (float)
 - collectiond: collection identifier
-- cohort: cohort name for this grade
+- cohort: cohort id for this cohort
 
 ### `students` (object array; required)
 `students` is an array of object containing the following properties:
 - id: student id
 - username : name of the user
-- cohort: array of cohort this user belongs to
+- cohort: array of cohort this user belongs to (integer)
 - firstactivecollection: collection id for which we detected the first activity of this student (grade > 0)
 
 ### `activities` (object array; required)

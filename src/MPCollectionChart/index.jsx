@@ -158,6 +158,7 @@ class MPCollectionChart extends React.Component {
           students={this.props.students}
           studentSelection={this.state.studentlist}
           collections={this.props.collections}
+          cohorts={this.props.cohorts}
           onClose={this.closeStudentList}
         />
       );
@@ -190,14 +191,18 @@ MPCollectionChart.propTypes = {
     activityid: PropTypes.number,
     value: PropTypes.number,
     collectionid: PropTypes.number,
-    cohort: PropTypes.string,
+    cohort: PropTypes.number,
   })).isRequired,
   students: PropTypes.arrayOf(PropTypes.shape({
     username: PropTypes.string,
     id: PropTypes.number,
-    cohort: PropTypes.string,
+    cohorts: PropTypes.arrayOf(PropTypes.number),
     firstactivecollection: PropTypes.number,
   })).isRequired,
+  cohorts: PropTypes.arrayOf(PropTypes.shape({
+    id: PropTypes.number,
+    name: PropTypes.string,
+  })),
   activities: PropTypes.arrayOf(PropTypes.shape({
     id: PropTypes.number,
     name: PropTypes.string,
@@ -211,6 +216,7 @@ MPCollectionChart.defaultProps = {
   className: undefined,
   headingClassName: [],
   onStudentSelectionChange: null,
+  cohorts: [],
 };
 
 

@@ -33,6 +33,7 @@ storiesOf('MPCollectionChart', module)
       students={gradesData.students}
       collections={gradesData.collections}
       activities={gradesData.activities}
+      cohorts={gradesData.cohorts}
       caption="Basic Generation Chart"
     />
   ))
@@ -42,6 +43,7 @@ storiesOf('MPCollectionChart', module)
       students={gradesData.students}
       collections={gradesData.collections}
       activities={gradesData.activities}
+      cohorts={gradesData.cohorts}
       selectedStudents={[152]}
       caption="Generation Chart with one student preselected"
     />
@@ -54,6 +56,7 @@ storiesOf('MPCollectionChart', module)
             students={data.students}
             collections={data.collections}
             activities={data.activities}
+            cohorts={data.cohorts}
             caption="Generation Chart with a lot of data"
           />) : (<p> Fetching Data ...</p>))
         }

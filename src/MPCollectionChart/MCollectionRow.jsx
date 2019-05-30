@@ -16,14 +16,14 @@ class MPCollectionRow extends React.Component {
     let headerRows;
     if (activityid !== undefined) {
       keyprefix = `${activityid}-${this.props.name}`;
-      headerRows = [<td/>,
-        <td>{this.props.activities.find(a => a.id === activityid).name} </td>];
+      headerRows = [<td key="button" />,
+        <td key="activity">{this.props.activities.find(a => a.id === activityid).name} </td>];
     } else {
       headerRows = [
-        <td>
+        <td key="button">
           <button onClick={this.toggleRowDetails}>S:{this.props.name}</button>
         </td>,
-        <td/>];
+        <td key="activity" />];
     }
     return (
       <tr key={`activityrow-${keyprefix}-${this.props.name}`}>
@@ -113,7 +113,7 @@ MPCollectionRow.propTypes = {
     activityid: PropTypes.number,
     value: PropTypes.number,
     collectionid: PropTypes.number,
-    cohort: PropTypes.string,
+    cohort: PropTypes.number,
   })).isRequired,
   activities: PropTypes.arrayOf(PropTypes.shape({
     id: PropTypes.number,
@@ -127,7 +127,7 @@ MPCollectionRow.propTypes = {
   students: PropTypes.arrayOf(PropTypes.shape({
     username: PropTypes.string,
     id: PropTypes.number,
-    cohort: PropTypes.string,
+    cohorts: PropTypes.arrayOf(PropTypes.number),
     firstactivecollection: PropTypes.number,
   })).isRequired,
   onStudentSelectionChange: PropTypes.func,

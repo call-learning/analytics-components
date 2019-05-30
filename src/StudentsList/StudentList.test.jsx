@@ -11,6 +11,7 @@ describe('<StudentList />', () => {
       students={gradesData.students}
       studentSelection={[151, 201]}
       collections={gradesData.collections}
+      cohorts={gradesData.cohorts}
     />).find('StudentsList');
 
     it('this is a table with two rows', () => {
