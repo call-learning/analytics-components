@@ -10,7 +10,7 @@ have done
 `collections` specifies the collection time/datestamp on which the grade collection has been done. Each
 collection is an object with the following properties.
 - id: an identified for this collection
-- filename: (string) ame of the filename containing the collection
+- url: (string) ame of the url containing the collection
 - timestamp: (number) the timestamp date of the collection
 
 ### `grades` (object array; required)

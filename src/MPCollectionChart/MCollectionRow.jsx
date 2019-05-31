@@ -11,7 +11,7 @@ class MPCollectionRow extends React.Component {
     this.changeStudentSelection = this.changeStudentSelection.bind(this);
     this.displayStudentList = this.displayStudentList.bind(this);
   }
-  getRowContent(allGrades, gradesFilter, allcolumns, activityid) {
+  getRowContent(allGrades, gradesFilter, collections, activityid) {
     let keyprefix = `sum-${this.props.name}`;
     let headerRows;
     if (activityid !== undefined) {
@@ -38,7 +38,7 @@ class MPCollectionRow extends React.Component {
           key={`${keyprefix}-${this.props.name}-total`}
         />
         {
-          allcolumns.map(coll => (
+          collections.map(coll => (
             <MPCollectionCell
               grades={gradesFilter(coll.id)}
               students={this.props.students}
@@ -67,7 +67,7 @@ class MPCollectionRow extends React.Component {
 
   render() {
     const {
-      grades, name, allcolumns,
+      grades, name, collections,
     } = this.props;
     const gradesPerCollection = group(
       grades,
@@ -77,7 +77,7 @@ class MPCollectionRow extends React.Component {
     allActivitiesRows.push(this.getRowContent(
       grades,
       collid => gradesPerCollection.get(collid),
-      allcolumns,
+      collections,
     ));
     if (!this.state.isFolded) {
       const gradesPerActivityType = group(
@@ -91,7 +91,7 @@ class MPCollectionRow extends React.Component {
             .flat(),
           collid => gradesPerActivityType.get(activityid)
             .get(collid),
-          allcolumns,
+          collections,
           activityid,
         ));
       });
@@ -119,9 +119,9 @@ MPCollectionRow.propTypes = {
     id: PropTypes.number,
     name: PropTypes.string,
   })).isRequired,
-  allcolumns: PropTypes.arrayOf(PropTypes.shape({
+  collections: PropTypes.arrayOf(PropTypes.shape({
     id: PropTypes.number,
-    filename: PropTypes.string,
+    url: PropTypes.string,
     timestamp: PropTypes.number,
   })).isRequired,
   students: PropTypes.arrayOf(PropTypes.shape({

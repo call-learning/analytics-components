@@ -5,10 +5,7 @@ import { group, rollup, max } from 'd3-array';
 import MPCollectionRow from './MCollectionRow';
 import StudentsList from '../StudentsList';
 
-/**
- *
- *
- */
+
 class MPCollectionChart extends React.Component {
   constructor(props) {
     super(props);
@@ -20,6 +17,93 @@ class MPCollectionChart extends React.Component {
     this.handleStudentSelectionChange = this.handleStudentSelectionChange.bind(this);
     this.displayStudentList = this.displayStudentList.bind(this);
     this.closeStudentList = this.closeStudentList.bind(this);
+    this.processGrades();
+  }
+
+  handleStudentSelectionChange(studentList) {
+    if (this.props.onStudentSelectionChange) {
+      this.props.onStudentSelectionChange(studentList);
+    }
+    this.setState({ selectedStudents: studentList });
+  }
+
+  getHeadings() {
+    return (
+      <thead
+        className={classNames(this.props.headingClassName)}
+      >
+        <tr>
+          <th key="col-start" scope="col" />
+          <th key="activity" scope="col" />
+          <th key="total" scope="col">Total</th>
+          {
+          this.props.collections.map((currentCollection, index) =>
+            (<th key={index} scope="col">
+              <div>{`C${index}`}</div>
+              <div
+                className="collection-date"
+              >{(new Date(currentCollection.timestamp)).toLocaleDateString()}
+              </div>
+            </th>))
+        }
+        </tr>
+      </thead>
+    );
+  }
+
+  getTable() {
+    if (!this.state.processedGrades) {
+      return (<p>Processing ....</p>);
+    }
+    const maxGradesCount = max(
+      this.state.processedGrades.gradesPerFirstCollection.values(),
+      gcol => gcol.length,
+    );// Extract the max value from each submap
+    const allrows = [];
+    this.state.processedGrades.gradesPerFirstCollection.forEach((grades, firstCollection) => {
+      allrows.push(<MPCollectionRow
+        key={`mpcollrow-${firstCollection}`}
+        name={Number(firstCollection)
+          .toString()}
+        grades={grades}
+        activities={this.props.activities}
+        collections={this.props.collections}
+        students={this.props.students}
+        studentSelection={this.state.selectedStudents}
+        onStudentSelectionChange={this.handleStudentSelectionChange}
+        onDisplayStudentList={this.displayStudentList}
+        maxGradesCount={maxGradesCount}
+      />);
+    });
+
+    return (
+      <table className={classNames(
+        'table',
+        this.props.className,
+      )}
+      >
+        {this.getCaption()}
+        {this.getHeadings()}
+        <tbody>
+          {allrows}
+        </tbody>
+      </table>
+    );
+  }
+  componentDidUpdate(prevProps) {
+    // Typical usage (don't forget to compare props):
+    if (this.props.grades.length !== prevProps.grades.length) {
+      this.processGrades();
+    }
+  }
+
+  getCaption() {
+    return this.props.caption && (
+      <caption>{this.props.caption}</caption>
+    );
+  }
+
+  processGrades() {
     // We take the grade processing out of the main thread
     const processgrades = new Promise((resolve) => {
       // We need to extract the changing grades week per week, so we only get additional changes
@@ -74,84 +158,9 @@ class MPCollectionChart extends React.Component {
     });
   }
 
-  getCaption() {
-    return this.props.caption && (
-      <caption>{this.props.caption}</caption>
-    );
-  }
-
-  handleStudentSelectionChange(studentList) {
-    if (this.props.onStudentSelectionChange) {
-      this.props.onStudentSelectionChange(studentList);
-    }
-    this.setState({ selectedStudents: studentList });
-  }
-
-  getHeadings() {
-    return (
-      <thead
-        className={classNames(this.props.headingClassName)}
-      >
-        <tr>
-          <th key="col-start" scope="col" />
-          <th key="activity" scope="col" />
-          <th key="total" scope="col">Total</th>
-          {
-          this.props.collections.map((currentCollection, index) =>
-            (<th key={index} scope="col">
-              <div>{`C${index}`}</div>
-              <div
-                className="collection-date"
-              >{(new Date(currentCollection.timestamp)).toLocaleDateString()}
-              </div>
-            </th>))
-        }
-        </tr>
-      </thead>
-    );
-  }
-
-  getTable() {
-    if (!this.state.processedGrades) {
-      return (<p>Processing ....</p>);
-    }
-    const maxGradesCount = max(
-      this.state.processedGrades.gradesPerFirstCollection.values(),
-      gcol => gcol.length,
-    );// Extract the max value from each submap
-    const allrows = [];
-    this.state.processedGrades.gradesPerFirstCollection.forEach((grades, firstCollection) => {
-      allrows.push(<MPCollectionRow
-        key={`mpcollrow-${firstCollection}`}
-        name={Number(firstCollection)
-            .toString()}
-        grades={grades}
-        activities={this.props.activities}
-        allcolumns={this.props.collections}
-        students={this.props.students}
-        studentSelection={this.state.selectedStudents}
-        onStudentSelectionChange={this.handleStudentSelectionChange}
-        onDisplayStudentList={this.displayStudentList}
-        maxGradesCount={maxGradesCount}
-      />);
-    });
-
-    return (
-      <table className={classNames(
-        'table',
-        this.props.className,
-      )}
-      >
-        {this.getCaption()}
-        {this.getHeadings()}
-        <tbody>
-          {allrows}
-        </tbody>
-      </table>
-    );
-  }
 
   render() {
+    console.log('Rendering');
     if (this.state.studentlist) {
       return (
         <StudentsList
@@ -183,7 +192,7 @@ MPCollectionChart.propTypes = {
   className: PropTypes.string,
   collections: PropTypes.arrayOf(PropTypes.shape({
     id: PropTypes.number,
-    filename: PropTypes.string,
+    url: PropTypes.string,
     timestamp: PropTypes.number,
   })).isRequired,
   grades: PropTypes.arrayOf(PropTypes.shape({
@@ -218,6 +227,5 @@ MPCollectionChart.defaultProps = {
   onStudentSelectionChange: null,
   cohorts: [],
 };
-
 
 export default MPCollectionChart;

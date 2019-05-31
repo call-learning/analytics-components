@@ -86,7 +86,7 @@ StudentsList.propTypes = {
   studentSelection: PropTypes.arrayOf(PropTypes.number),
   collections: PropTypes.arrayOf(PropTypes.shape({
     id: PropTypes.number,
-    filename: PropTypes.string,
+    url: PropTypes.string,
     timestamp: PropTypes.number,
   })).isRequired,
   cohorts: PropTypes.arrayOf(PropTypes.shape({
