@@ -20,35 +20,11 @@ class MPCollectionChart extends React.Component {
     this.processGrades();
   }
 
-  handleStudentSelectionChange(studentList) {
-    if (this.props.onStudentSelectionChange) {
-      this.props.onStudentSelectionChange(studentList);
+  componentDidUpdate(prevProps) {
+    // Typical usage (don't forget to compare props):
+    if (this.props.grades.length !== prevProps.grades.length) {
+      this.processGrades();
     }
-    this.setState({ selectedStudents: studentList });
-  }
-
-  getHeadings() {
-    return (
-      <thead
-        className={classNames(this.props.headingClassName)}
-      >
-        <tr>
-          <th key="col-start" scope="col" />
-          <th key="activity" scope="col" />
-          <th key="total" scope="col">Total</th>
-          {
-          this.props.collections.map((currentCollection, index) =>
-            (<th key={index} scope="col">
-              <div>{`C${index}`}</div>
-              <div
-                className="collection-date"
-              >{(new Date(currentCollection.timestamp)).toLocaleDateString()}
-              </div>
-            </th>))
-        }
-        </tr>
-      </thead>
-    );
   }
 
   getTable() {
@@ -61,7 +37,9 @@ class MPCollectionChart extends React.Component {
     );// Extract the max value from each submap
     const allrows = [];
     this.state.processedGrades.gradesPerFirstCollection.forEach((grades, firstCollection) => {
+      /* The index is in fact a key, so it is fine */
       allrows.push(<MPCollectionRow
+        /* eslint-disable-next-line react/no-array-index-key */
         key={`mpcollrow-${firstCollection}`}
         name={Number(firstCollection)
           .toString()}
@@ -69,7 +47,7 @@ class MPCollectionChart extends React.Component {
         activities={this.props.activities}
         collections={this.props.collections}
         students={this.props.students}
-        studentSelection={this.state.selectedStudents}
+        selectedStudents={this.state.selectedStudents}
         onStudentSelectionChange={this.handleStudentSelectionChange}
         onDisplayStudentList={this.displayStudentList}
         maxGradesCount={maxGradesCount}
@@ -90,17 +68,44 @@ class MPCollectionChart extends React.Component {
       </table>
     );
   }
-  componentDidUpdate(prevProps) {
-    // Typical usage (don't forget to compare props):
-    if (this.props.grades.length !== prevProps.grades.length) {
-      this.processGrades();
-    }
+
+  getHeadings() {
+    return (
+      <thead
+        className={classNames(this.props.headingClassName)}
+      >
+        <tr>
+          <th key="col-start" scope="col" />
+          <th key="activity" scope="col" />
+          <th key="total" scope="col">Total</th>
+          {
+            this.props.collections.map((currentCollection, index) =>
+              (
+                <th key={currentCollection.timestamp} scope="col">
+                  <div>{`C${index}`}</div>
+                  <div
+                    className="collection-date"
+                  >{(new Date(currentCollection.timestamp)).toLocaleDateString()}
+                  </div>
+                </th>
+              ))
+          }
+        </tr>
+      </thead>
+    );
   }
 
   getCaption() {
     return this.props.caption && (
       <caption>{this.props.caption}</caption>
     );
+  }
+
+  handleStudentSelectionChange(studentList) {
+    if (this.props.onStudentSelectionChange) {
+      this.props.onStudentSelectionChange(studentList);
+    }
+    this.setState({ selectedStudents: studentList });
   }
 
   processGrades() {
@@ -158,14 +163,20 @@ class MPCollectionChart extends React.Component {
     });
   }
 
+  displayStudentList(studentlist) {
+    this.setState({ studentlist });
+  }
+
+  closeStudentList() {
+    this.setState({ studentlist: false });
+  }
 
   render() {
-    console.log('Rendering');
     if (this.state.studentlist) {
       return (
         <StudentsList
           students={this.props.students}
-          studentSelection={this.state.studentlist}
+          selectedStudents={this.state.studentlist}
           collections={this.props.collections}
           cohorts={this.props.cohorts}
           onClose={this.closeStudentList}
@@ -173,14 +184,6 @@ class MPCollectionChart extends React.Component {
       );
     }
     return this.getTable();
-  }
-
-  closeStudentList() {
-    this.setState({ studentlist: false });
-  }
-
-  displayStudentList(studentlist) {
-    this.setState({ studentlist });
   }
 }
 
@@ -208,6 +211,7 @@ MPCollectionChart.propTypes = {
     cohorts: PropTypes.arrayOf(PropTypes.number),
     firstactivecollection: PropTypes.number,
   })).isRequired,
+  selectedStudents: PropTypes.arrayOf(PropTypes.number),
   cohorts: PropTypes.arrayOf(PropTypes.shape({
     id: PropTypes.number,
     name: PropTypes.string,
@@ -226,6 +230,7 @@ MPCollectionChart.defaultProps = {
   headingClassName: [],
   onStudentSelectionChange: null,
   cohorts: [],
+  selectedStudents: [],
 };
 
 export default MPCollectionChart;

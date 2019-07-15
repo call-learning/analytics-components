@@ -8,7 +8,7 @@
 
 .selected-students {
   fill: red;
-  elevation: 1;
+  elevation: above;
 }
 
 g.text-label rect {
@@ -29,4 +29,8 @@ g.text-label text {
 
 .no-students {
   fill: darkgray;
+}
+.tc-button {
+  background: transparent;
+  border: none;
 }

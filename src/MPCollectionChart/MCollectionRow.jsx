@@ -30,8 +30,7 @@ class MPCollectionRow extends React.Component {
         {headerRows}
         <MPCollectionCell
           grades={allGrades}
-          students={this.props.students}
-          studentSelection={this.props.studentSelection}
+          selectedStudents={this.props.selectedStudents}
           onStudentSelectionChange={this.changeStudentSelection}
           onDisplayStudentList={this.displayStudentList}
           maxGradesCount={this.props.maxGradesCount}
@@ -41,8 +40,7 @@ class MPCollectionRow extends React.Component {
           collections.map(coll => (
             <MPCollectionCell
               grades={gradesFilter(coll.id)}
-              students={this.props.students}
-              studentSelection={this.props.studentSelection}
+              selectedStudents={this.props.selectedStudents}
               onStudentSelectionChange={this.changeStudentSelection}
               onDisplayStudentList={this.displayStudentList}
               maxGradesCount={this.props.maxGradesCount}
@@ -67,7 +65,7 @@ class MPCollectionRow extends React.Component {
 
   render() {
     const {
-      grades, name, collections,
+      grades, collections,
     } = this.props;
     const gradesPerCollection = group(
       grades,
@@ -101,7 +99,7 @@ class MPCollectionRow extends React.Component {
 }
 
 MPCollectionRow.defaultProps = {
-  studentSelection: [],
+  selectedStudents: [],
   onStudentSelectionChange: null,
   onDisplayStudentList: null,
 };
@@ -124,16 +122,10 @@ MPCollectionRow.propTypes = {
     url: PropTypes.string,
     timestamp: PropTypes.number,
   })).isRequired,
-  students: PropTypes.arrayOf(PropTypes.shape({
-    username: PropTypes.string,
-    id: PropTypes.number,
-    cohorts: PropTypes.arrayOf(PropTypes.number),
-    firstactivecollection: PropTypes.number,
-  })).isRequired,
   onStudentSelectionChange: PropTypes.func,
   onDisplayStudentList: PropTypes.func,
   maxGradesCount: PropTypes.number.isRequired,
-  studentSelection: PropTypes.arrayOf(PropTypes.number),
+  selectedStudents: PropTypes.arrayOf(PropTypes.number),
 };
 
 export default MPCollectionRow;
