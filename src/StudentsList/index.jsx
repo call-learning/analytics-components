@@ -24,7 +24,7 @@ class StudentsList extends React.Component {
           <div />
           <Table
             data={
-              this.props.studentSelection.map((studentid) => {
+              this.props.selectedStudents.map((studentid) => {
                 const student =
                   Object.assign({}, this.props.students.find(st => st.id === studentid));
                 student.firstactivecollectionts =
@@ -83,7 +83,7 @@ StudentsList.propTypes = {
     cohorts: PropTypes.arrayOf(PropTypes.number),
     firstactivecollection: PropTypes.number,
   })).isRequired,
-  studentSelection: PropTypes.arrayOf(PropTypes.number),
+  selectedStudents: PropTypes.arrayOf(PropTypes.number),
   collections: PropTypes.arrayOf(PropTypes.shape({
     id: PropTypes.number,
     url: PropTypes.string,

@@ -1,22 +1,19 @@
 import React from 'react';
 import classNames from 'classnames';
-import PropTypes from 'prop-types';
 import { group, rollup, max } from 'd3-array';
 import MPCollectionRow from './MCollectionRow';
-import StudentsList from '../StudentsList';
+import {
+  graphComponentWithGrades,
+  defaultGraphComponentPropsDefault,
+  defaultGraphComponentPropTypes,
+} from '../HOCGraphWithGrades';
 
-
-class MPCollectionChart extends React.Component {
+class TableCollectionChart extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      selectedStudents: this.props.selectedStudents,
       processedGrades: null,
-      studentlist: false,
     };
-    this.handleStudentSelectionChange = this.handleStudentSelectionChange.bind(this);
-    this.displayStudentList = this.displayStudentList.bind(this);
-    this.closeStudentList = this.closeStudentList.bind(this);
     this.processGrades();
   }
 
@@ -47,9 +44,9 @@ class MPCollectionChart extends React.Component {
         activities={this.props.activities}
         collections={this.props.collections}
         students={this.props.students}
-        selectedStudents={this.state.selectedStudents}
-        onStudentSelectionChange={this.handleStudentSelectionChange}
-        onDisplayStudentList={this.displayStudentList}
+        selectedStudents={this.props.selectedStudents}
+        onStudentSelectionChange={this.props.onStudentSelectionChange}
+        onDisplayStudentList={this.props.onDisplayStudentList}
         maxGradesCount={maxGradesCount}
       />);
     });
@@ -99,13 +96,6 @@ class MPCollectionChart extends React.Component {
     return this.props.caption && (
       <caption>{this.props.caption}</caption>
     );
-  }
-
-  handleStudentSelectionChange(studentList) {
-    if (this.props.onStudentSelectionChange) {
-      this.props.onStudentSelectionChange(studentList);
-    }
-    this.setState({ selectedStudents: studentList });
   }
 
   processGrades() {
@@ -163,74 +153,13 @@ class MPCollectionChart extends React.Component {
     });
   }
 
-  displayStudentList(studentlist) {
-    this.setState({ studentlist });
-  }
-
-  closeStudentList() {
-    this.setState({ studentlist: false });
-  }
-
   render() {
-    if (this.state.studentlist) {
-      return (
-        <StudentsList
-          students={this.props.students}
-          selectedStudents={this.state.studentlist}
-          collections={this.props.collections}
-          cohorts={this.props.cohorts}
-          onClose={this.closeStudentList}
-        />
-      );
-    }
     return this.getTable();
   }
 }
 
-MPCollectionChart.propTypes = {
-  caption: PropTypes.oneOfType([
-    PropTypes.string,
-    PropTypes.element,
-  ]),
-  className: PropTypes.string,
-  collections: PropTypes.arrayOf(PropTypes.shape({
-    id: PropTypes.number,
-    url: PropTypes.string,
-    timestamp: PropTypes.number,
-  })).isRequired,
-  grades: PropTypes.arrayOf(PropTypes.shape({
-    studentid: PropTypes.number,
-    activityid: PropTypes.number,
-    value: PropTypes.number,
-    collectionid: PropTypes.number,
-    cohort: PropTypes.number,
-  })).isRequired,
-  students: PropTypes.arrayOf(PropTypes.shape({
-    username: PropTypes.string,
-    id: PropTypes.number,
-    cohorts: PropTypes.arrayOf(PropTypes.number),
-    firstactivecollection: PropTypes.number,
-  })).isRequired,
-  selectedStudents: PropTypes.arrayOf(PropTypes.number),
-  cohorts: PropTypes.arrayOf(PropTypes.shape({
-    id: PropTypes.number,
-    name: PropTypes.string,
-  })),
-  activities: PropTypes.arrayOf(PropTypes.shape({
-    id: PropTypes.number,
-    name: PropTypes.string,
-  })).isRequired,
-  onStudentSelectionChange: PropTypes.func,
-  headingClassName: PropTypes.arrayOf(PropTypes.string),
-};
+TableCollectionChart.propTypes = defaultGraphComponentPropTypes;
+TableCollectionChart.defaultProps = defaultGraphComponentPropsDefault;
 
-MPCollectionChart.defaultProps = {
-  caption: null,
-  className: undefined,
-  headingClassName: [],
-  onStudentSelectionChange: null,
-  cohorts: [],
-  selectedStudents: [],
-};
-
-export default MPCollectionChart;
+const MPCollectionChart = graphComponentWithGrades(TableCollectionChart);
+export default MPCollectionChart ;

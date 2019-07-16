@@ -9,7 +9,7 @@ describe('<StudentList />', () => {
   describe('renders', () => {
     const wrapper = mount(<StudentsList
       students={gradesData.students}
-      studentSelection={[151, 201]}
+      selectedStudents={[151, 201]}
       collections={gradesData.collections}
       cohorts={gradesData.cohorts}
     />).find('StudentsList');

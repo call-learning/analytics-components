@@ -11,7 +11,7 @@ storiesOf('StudentList', module)
   .add('Basic', () => (
     <StudentList
       students={gradesData.students}
-      studentSelection={[151, 201]}
+      selectedStudents={[151, 201]}
       collections={gradesData.collections}
       cohorts={gradesData.cohorts}
     />

@@ -3,11 +3,13 @@ import { scaleLinear } from 'd3-scale';
 import PropTypes from 'prop-types';
 
 class MPCollectionCell extends React.Component {
+
   constructor(props) {
     super(props);
     this.changeStudentSelection = this.changeStudentSelection.bind(this);
     this.displayStudentList = this.displayStudentList.bind(this);
   }
+
   // Tools - Internal
   getStudentListFromGrades() {
     const studentIds = this.props.grades.reduce(
@@ -20,14 +22,17 @@ class MPCollectionCell extends React.Component {
     return [...studentIds];
   }
 
+  // Here we use arrow function as shortcut, so we avoid binding
   changeStudentSelection() {
     this.props.onStudentSelectionChange(this.getStudentListFromGrades());
   }
-  displayStudentList(event) {
+
+  displayStudentList(e) {
     this.props.onDisplayStudentList(this.getStudentListFromGrades());
-    event.preventDefault();
-    event.stopPropagation();
+    e.preventDefault();
+    e.stopPropagation();
   }
+
   render() {
     const { grades, cellSize } = this.props;
     const scale = scaleLinear()

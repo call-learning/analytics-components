@@ -9,6 +9,7 @@ const props = {
   grades: gradesData.grades,
   students: gradesData.students,
   collections: gradesData.collections,
+  activities: gradesData.activities,
   caption: 'Simple Generation Chart',
 };
 

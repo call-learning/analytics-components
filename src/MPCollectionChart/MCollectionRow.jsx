@@ -8,8 +8,6 @@ class MPCollectionRow extends React.Component {
     super(props);
     this.state = { isFolded: true };
     this.toggleRowDetails = this.toggleRowDetails.bind(this);
-    this.changeStudentSelection = this.changeStudentSelection.bind(this);
-    this.displayStudentList = this.displayStudentList.bind(this);
   }
   getRowContent(allGrades, gradesFilter, collections, activityid) {
     let keyprefix = `sum-${this.props.name}`;
@@ -31,8 +29,8 @@ class MPCollectionRow extends React.Component {
         <MPCollectionCell
           grades={allGrades}
           selectedStudents={this.props.selectedStudents}
-          onStudentSelectionChange={this.changeStudentSelection}
-          onDisplayStudentList={this.displayStudentList}
+          onStudentSelectionChange={this.props.onStudentSelectionChange}
+          onDisplayStudentList={this.props.onDisplayStudentList}
           maxGradesCount={this.props.maxGradesCount}
           key={`${keyprefix}-${this.props.name}-total`}
         />
@@ -41,20 +39,14 @@ class MPCollectionRow extends React.Component {
             <MPCollectionCell
               grades={gradesFilter(coll.id)}
               selectedStudents={this.props.selectedStudents}
-              onStudentSelectionChange={this.changeStudentSelection}
-              onDisplayStudentList={this.displayStudentList}
+              onStudentSelectionChange={this.props.onStudentSelectionChange}
+              onDisplayStudentList={this.props.onDisplayStudentList}
               maxGradesCount={this.props.maxGradesCount}
               key={`act-${keyprefix}-${coll.id}`}
             />))
         }
       </tr>
     );
-  }
-  displayStudentList(studentlist) {
-    this.props.onDisplayStudentList(studentlist);
-  }
-  changeStudentSelection(studentList) {
-    this.props.onStudentSelectionChange(studentList);
   }
 
   toggleRowDetails() {
