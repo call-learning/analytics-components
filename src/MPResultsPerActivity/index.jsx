@@ -1,11 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { scaleLinear, scaleBand, scaleOrdinal } from 'd3-scale';
+import { scaleOrdinal } from 'd3-scale';
 import { rollup, max } from 'd3-array';
 import { select } from 'd3-selection';
 import { schemeCategory10 } from 'd3-scale-chromatic';
 import { transform } from 'd3-transform';
-import { axisBottom, axisLeft } from 'd3-axis';
 import {
   graphComponentWithGrades,
   defaultGraphComponentPropsDefault,
@@ -13,9 +12,18 @@ import {
 } from '../HOCGraphWithGrades';
 import getQuantile from '../utils/quantileFromValue';
 import bestGradesPerStudentAndActivity from '../utils/bestGradesPerStudentAndActivity';
+import {
+  getBarChartMargin,
+  getBarChartScaleX,
+  getBarChartScaleY,
+  getBarChartXAxis,
+  getBarChartYAxis,
+  appendAxisToGraph,
+  addRectangleInteractivity,
+} from '../utils/barChartCommons';
 
 
-class PerExerciceBarChart extends React.Component {
+class PerActivityBarChart extends React.Component {
   static defaultProps = {
     size: {
       width: {
@@ -35,6 +43,8 @@ class PerExerciceBarChart extends React.Component {
   }
 
   componentDidMount() {
+    // We silence errors here because they are actually validated but lint does not see it as it is
+    // made in the HOC
     this.d3Chart(
       // eslint-disable-next-line react/prop-types
       this.node,
@@ -51,26 +61,11 @@ class PerExerciceBarChart extends React.Component {
   }
 
   d3Chart(node, selectedaid, gradeList, activityList, studentList, quantiles, title) {
-    const graphMargin = {
-      left: 50,
-      right: 20,
-      top: 20,
-      bottom: 80,
-    };
-
-    const graphInnerHeight = this.props.size.height - (graphMargin.top + graphMargin.bottom);
-    const graphInnerWidth = this.props.size.width - (graphMargin.left + graphMargin.right);
-
     // The first scale, horizontal scale (X) that will just go through each activity
-    const scaleX = scaleBand()
-      .domain(quantiles)
-      .rangeRound([0, graphInnerWidth])
-      .padding(this.props.padding);
+    const scaleX = getBarChartScaleX(this.props.size.width, quantiles, this.props.padding);
 
     // Build the data structure to display
-
     // Now we optionally filter out students or cohorts from the Gradelist
-
     // First we get grades for the specified activity and sort it by quantiles
     const gradesForActivty = bestGradesPerStudentAndActivity(gradeList).get(selectedaid).values();
 
@@ -93,17 +88,14 @@ class PerExerciceBarChart extends React.Component {
       acc => acc[1].gradescount,
     );
     // Second scale in Y, the values being between 0 and max
-    const scaleY = scaleLinear()
-      .domain([0, maxHeight])
-      .range([graphInnerHeight, 0]);
-
+    const scaleY = getBarChartScaleY(this.props.size.height, maxHeight);
 
     const svg = select(node)
       .select('svg');
     const graph = svg.append('g')
       .attr('class', 'graph')
       .attr('transform', transform()
-        .translate(graphMargin.left, graphMargin.top));
+        .translate(getBarChartMargin().left, getBarChartMargin().top));
 
     // We add an element of type <g class='layer'...> for each quantile
     const quantileRect = graph.selectAll('.layer')
@@ -119,7 +111,7 @@ class PerExerciceBarChart extends React.Component {
       .attr('y', quantileGrade => scaleY(quantileGrade.gradescount));
 
     // Create the Tooltips
-    quantileRect.on('click', (d) => {
+    addRectangleInteractivity('click', quantileRect, (d) => {
       // eslint-disable-next-line react/prop-types
       this.props.onDisplayStudentList(d.studentsid);
     });
@@ -127,38 +119,17 @@ class PerExerciceBarChart extends React.Component {
     // Now the Axes
     const axis = svg.append('g')
       .attr('class', 'axis');
-
-    const xAxis = axisBottom()
-      .scale(scaleX)
-      .tickSize(0)
-      .tickPadding(6)
-      .tickFormat((quantilevalue) => {
+    const xAxis = getBarChartXAxis(
+      scaleX,
+      (quantilevalue) => {
         const index = quantiles.findIndex(q => q === quantilevalue);
         const bottomvalue = (index === 0) ? 0 : quantiles[index - 1];
         const topvalue = quantiles[index];
         return `${bottomvalue}-${topvalue}`;
-      });
-
-    axis.append('g')
-      .attr('class', 'xAxis')
-      .attr('transform', transform()
-        .translate(graphMargin.left, graphInnerHeight + graphMargin.top))
-      .call(xAxis)
-      .selectAll('text')
-      .style('text-anchor', 'end')
-      .style('font-size', '18px')
-      .attr('transform', () => 'rotate(-45)');
-
-
-    const yAxis = axisLeft()
-      .scale(scaleY)
-      .tickSize(10);
-
-    axis.append('g')
-      .attr('class', 'yAxis')
-      .attr('transform', transform()
-        .translate(graphMargin.left, graphMargin.top))
-      .call(yAxis);
+      },
+    );
+    const yAxis = getBarChartYAxis(scaleY);
+    appendAxisToGraph(axis, xAxis, yAxis);
   }
 
   processGrades() {
@@ -188,7 +159,7 @@ class PerExerciceBarChart extends React.Component {
 }
 
 
-PerExerciceBarChart.propTypes = {
+PerActivityBarChart.propTypes = {
   size: PropTypes.shape({
     width: PropTypes.number,
     height: PropTypes.number,
@@ -196,9 +167,9 @@ PerExerciceBarChart.propTypes = {
   padding: PropTypes.string,
   selectedActivityID: PropTypes.number,
 };
-Object.assign(PerExerciceBarChart.propTypes, defaultGraphComponentPropTypes);
+Object.assign(PerActivityBarChart.propTypes, defaultGraphComponentPropTypes);
 
-PerExerciceBarChart.defaultProps = {
+PerActivityBarChart.defaultProps = {
   size: {
     width: 1300,
     height: 500,
@@ -206,7 +177,7 @@ PerExerciceBarChart.defaultProps = {
   padding: '0.08',
   selectedActivityID: 0,
 };
-Object.assign(PerExerciceBarChart.defaultProps, defaultGraphComponentPropsDefault);
+Object.assign(PerActivityBarChart.defaultProps, defaultGraphComponentPropsDefault);
 
-const MPPerExerciceBarChart = graphComponentWithGrades(PerExerciceBarChart);
-export default MPPerExerciceBarChart;
+const MPResultsPerActivity = graphComponentWithGrades(PerActivityBarChart);
+export default MPResultsPerActivity;

@@ -1,7 +1,7 @@
 import React from 'react';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { storiesOf } from '@storybook/react';
-import MPPerExerciceBarChart from './index';
+import MPResultsPerQuantile from './index';
 import README from './README.md';
 
 import { grades as gradesData } from './../../tests/data/grades.data';
@@ -14,12 +14,9 @@ class LoadData extends React.Component {
       data: null,
     };
   }
-
   componentDidMount() {
     // eslint-disable-next-line react/prop-types
-    fetch(this.props.url)
-      .then(response => response.json()
-        .then(data => this.setState({ data })));
+    fetch(this.props.url).then(response => response.json().then(data => this.setState({ data })));
   }
 
   render() {
@@ -28,21 +25,20 @@ class LoadData extends React.Component {
   }
 }
 
-storiesOf('MPPerExerciceBarChart', module)
+storiesOf('MPResultsPerQuantile', module)
   .addParameters({ info: { text: README } })
   .add('Basic', () => (
-    <MPPerExerciceBarChart
+    <MPResultsPerQuantile
       grades={gradesData.grades}
       students={gradesData.students}
       collections={gradesData.collections}
       activities={gradesData.activities}
       cohorts={gradesData.cohorts}
       caption="Stacked Chart Chart"
-      selectedActivityID={1}
     />
   ))
   .add('Preselected', () => (
-    <MPPerExerciceBarChart
+    <MPResultsPerQuantile
       grades={gradesData.grades}
       students={gradesData.students}
       collections={gradesData.collections}
@@ -50,22 +46,20 @@ storiesOf('MPPerExerciceBarChart', module)
       cohorts={gradesData.cohorts}
       selectedStudents={[152]}
       caption="Stacked Chart with one student preselected"
-      selectedActivityID={1}
     />
   ))
   .add('Volume Data', () => (
     <LoadData url="/volumesamplegrades.json">
       {data => (data ?
-        (<MPPerExerciceBarChart
-          grades={data.grades}
-          students={data.students}
-          collections={data.collections}
-          activities={data.activities}
-          cohorts={data.cohorts}
-          caption="Stacked Chart with a lot of data"
-          selectedActivityID={1}
-        />) : (<p> Fetching Data ...</p>))
-      }
+          (<MPResultsPerQuantile
+            grades={data.grades}
+            students={data.students}
+            collections={data.collections}
+            activities={data.activities}
+            cohorts={data.cohorts}
+            caption="Stacked Chart with a lot of data"
+          />) : (<p> Fetching Data ...</p>))
+        }
     </LoadData>
   ));
 

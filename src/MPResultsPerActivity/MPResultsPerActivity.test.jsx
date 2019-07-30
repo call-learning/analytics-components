@@ -1,7 +1,7 @@
 import React from 'react';
 import { mount } from 'enzyme';
 
-import MPStackedBarChart from './index';
+import MPResultsPerActivity from './index';
 
 import { grades as gradesData } from './../../tests/data/grades.data';
 
@@ -11,11 +11,12 @@ const props = {
   collections: gradesData.collections,
   activities: gradesData.activities,
   caption: 'Simple Stacked Chart',
+  selectedActivityID : 1,
 };
 
-describe('<StackedBarChart />', () => {
+describe('<MPResultsPerActivity />', () => {
   describe('renders', () => {
-    const wrapper = mount(<MPStackedBarChart {...props} />).find('MPCollectionChart');
+    const wrapper = mount(<MPResultsPerActivity {...props} />).find('MPCollectionChart');
 
     it('with display columns in the right order', () => {
       wrapper.find('th').forEach((th, i) => {
