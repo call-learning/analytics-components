@@ -1,11 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { scaleLinear, scaleBand, scaleOrdinal } from 'd3-scale';
-import { least, rollup, rollups, group, max } from 'd3-array';
-import { select, event } from 'd3-selection';
+import { rollup, max } from 'd3-array';
+import { select } from 'd3-selection';
 import { schemeCategory10 } from 'd3-scale-chromatic';
 import { transform } from 'd3-transform';
-import { axisBottom, axisLeft, axisRight, axisTop } from 'd3-axis';
+import { axisBottom, axisLeft } from 'd3-axis';
 import {
   graphComponentWithGrades,
   defaultGraphComponentPropsDefault,
@@ -37,7 +37,14 @@ class PerExerciceBarChart extends React.Component {
   componentDidMount() {
     this.d3Chart(
       // eslint-disable-next-line react/prop-types
-      this.node, this.props.selectedActivityID, this.props.grades, this.props.activities, this.props.students,
+      this.node,
+      this.props.selectedActivityID,
+      // eslint-disable-next-line react/prop-types
+      this.props.grades,
+      // eslint-disable-next-line react/prop-types
+      this.props.activities,
+      // eslint-disable-next-line react/prop-types
+      this.props.students,
       [0.25, 0.50, 0.75, 1],
       'Number of learners per exercise and their results',
     );
@@ -67,7 +74,8 @@ class PerExerciceBarChart extends React.Component {
     // First we get grades for the specified activity and sort it by quantiles
     const gradesForActivty = bestGradesPerStudentAndActivity(gradeList).get(selectedaid).values();
 
-    const gradesPerQuantile = rollup(gradesForActivty,
+    const gradesPerQuantile = rollup(
+      gradesForActivty,
       gs => ({
         quantilevalue: getQuantile(gs[0].value, quantiles), // Take the first grade's quantile as a ref.
         studentsid: gs.map(g => g.studentid),
@@ -102,19 +110,19 @@ class PerExerciceBarChart extends React.Component {
       .data(Array.from(gradesPerQuantile.values()))
       .enter()
       .append('rect')
-      .attr('x', g=> scaleX(g.quantilevalue))
+      .attr('x', g => scaleX(g.quantilevalue))
       .attr('width', scaleX.bandwidth())
       .style('fill', (q, index) => color(index))
       .attr('stroke', 'black')
       .attr('stroke-width', 0)
-      .attr('height', (quantileGrade) => scaleY(maxHeight - quantileGrade.gradescount))
+      .attr('height', quantileGrade => scaleY(maxHeight - quantileGrade.gradescount))
       .attr('y', quantileGrade => scaleY(quantileGrade.gradescount));
 
     // Create the Tooltips
-    quantileRect.on('click', ((d) => {
+    quantileRect.on('click', (d) => {
       // eslint-disable-next-line react/prop-types
       this.props.onDisplayStudentList(d.studentsid);
-    }).bind(this));
+    });
 
     // Now the Axes
     const axis = svg.append('g')
@@ -151,8 +159,6 @@ class PerExerciceBarChart extends React.Component {
       .attr('transform', transform()
         .translate(graphMargin.left, graphMargin.top))
       .call(yAxis);
-
-
   }
 
   processGrades() {

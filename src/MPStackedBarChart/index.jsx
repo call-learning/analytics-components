@@ -1,11 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { scaleLinear, scaleBand, scaleOrdinal } from 'd3-scale';
-import { least, rollup, rollups, group, max } from 'd3-array';
-import { select, event } from 'd3-selection';
+import { rollup, max } from 'd3-array';
+import { select } from 'd3-selection';
 import { schemeCategory10 } from 'd3-scale-chromatic';
 import { transform } from 'd3-transform';
-import { axisBottom, axisLeft, axisRight, axisTop } from 'd3-axis';
+import { axisBottom, axisLeft } from 'd3-axis';
 import {
   graphComponentWithGrades,
   defaultGraphComponentPropsDefault,
@@ -35,6 +35,7 @@ class StackedBarChart extends React.Component {
 
   componentDidMount() {
     this.d3Chart(
+      // eslint-disable-next-line react/prop-types
       this.node, this.props.grades, this.props.activities, this.props.students,
       [0.25, 0.50, 0.75, 1],
       'Number of learners per exercise and their results',
@@ -75,7 +76,7 @@ class StackedBarChart extends React.Component {
      */
 
 
-    const gradesPerActivityAndQuantile = new Array(); // No need to have a map as we need a flat
+    const gradesPerActivityAndQuantile = []; // No need to have a map as we need a flat
     // array for d3.data
     bestGradesPerActivity.forEach((grades, key) => {
       const ad = activityList.find(a => a.id === key);
@@ -138,7 +139,7 @@ class StackedBarChart extends React.Component {
       .style('fill', (q, index) => color(index))
       .attr('stroke', 'black')
       .attr('stroke-width', 0)
-      .attr('height', (quantileGrade, i, allvalues) => scaleY(maxHeight - quantileGrade.gradescount))
+      .attr('height', quantileGrade => scaleY(maxHeight - quantileGrade.gradescount))
       .attr('y', (currentQuantile, i, allQuantiles) =>
         scaleY(currentQuantile.gradescount + allQuantiles.reduce(
           (currentHeight, quantileGrades) =>
@@ -150,9 +151,10 @@ class StackedBarChart extends React.Component {
         )));
 
     // Create the Tooltips
-    rect.on('click', ((d) => {
+    rect.on('click', (d) => {
+      // eslint-disable-next-line react/prop-types
       this.props.onDisplayStudentList(d.studentsid);
-    }).bind(this));
+    });
 
     // Now the Axes
     const axis = svg.append('g')
@@ -162,7 +164,7 @@ class StackedBarChart extends React.Component {
       .scale(scaleX)
       .tickSize(0)
       .tickPadding(6)
-      .tickFormat(activityid => activityList.find(a => a.id == activityid).name);
+      .tickFormat(activityid => activityList.find(a => a.id === activityid).name);
 
     axis.append('g')
       .attr('class', 'xAxis')
@@ -172,7 +174,7 @@ class StackedBarChart extends React.Component {
       .selectAll('text')
       .style('text-anchor', 'end')
       .style('font-size', '18px')
-      .attr('transform', d => 'rotate(-45)');
+      .attr('transform', () => 'rotate(-45)');
 
 
     const yAxis = axisLeft()
