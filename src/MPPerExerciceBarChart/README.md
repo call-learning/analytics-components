@@ -1,4 +1,4 @@
-# MPStackedBarChart
+# MPPerExerciceBarChart
 
 This is the basic MOOC Pilot to represent mainly student's registration over
 time
@@ -39,3 +39,13 @@ collection is an object with the following properties.
 
 ### `caption` (string or element; optional, default: `null`)
 Specifies a descriptive caption to be applied to the entire table.
+
+### `className` (string array; optional; default: `[]`)
+Specifies Bootstrap class names to apply to the table. See [Bootstrap's table documentation](https://getbootstrap.com/docs/4.0/content/tables/) for a list of applicable class names.
+
+### `headingClassName` (string array; optional; default: `[]`)
+Specifies Bootstrap class names to apply to the table heading. Options are detailed in [Bootstrap's docs](https://getbootstrap.com/docs/4.0/content/tables/#table-head-options).
+
+### `rowHeaderColumnKey` (string; optional)
+Specifies the key for the column that should act as a row header. Rather than rendering as `<td>` elements,
+cells in this column will render as `<th scope="row">` 

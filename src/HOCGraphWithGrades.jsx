@@ -107,23 +107,16 @@ function graphComponentWithGrades(WrappedComponent) {
       }
 
       return (<WrappedComponent
-        caption={this.props.caption}
-        className={this.props.className}
-        collections={this.props.collections}
-        grades={this.props.grades}
-        students={this.props.students}
-        selectedStudents={this.state.selectedStudents}
-        cohorts={this.props.cohorts}
-        activities={this.props.activities}
-        headingClassName={this.props.headingClassName}
+        {...this.props}
         onStudentSelectionChange={this.handleStudentSelectionChange}
         onDisplayStudentList={this.displayStudentList}
+
       />);
     }
   };
 
-  componentWithGrades.propTypes = defaultGraphComponentPropTypes;
-  componentWithGrades.defaultProps = defaultGraphComponentPropsDefault;
+  componentWithGrades.propTypes = WrappedComponent.propTypes;
+  componentWithGrades.defaultProps = WrappedComponent.defaultProps;
 
   /* See https://github.com/airbnb/javascript/tree/master/react#naming */
   const WrappedComponentName = WrappedComponent.displayName

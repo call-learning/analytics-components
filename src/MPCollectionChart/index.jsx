@@ -162,4 +162,4 @@ TableCollectionChart.propTypes = defaultGraphComponentPropTypes;
 TableCollectionChart.defaultProps = defaultGraphComponentPropsDefault;
 
 const MPCollectionChart = graphComponentWithGrades(TableCollectionChart);
-export default MPCollectionChart ;
+export default MPCollectionChart;
