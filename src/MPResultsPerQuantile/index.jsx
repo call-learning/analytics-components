@@ -23,16 +23,6 @@ import {
 } from '../utils/barChartCommons';
 
 class StackedBarChart extends React.Component {
-  static defaultProps = {
-    size: {
-      width: {
-        width: 1300,
-        height: 500,
-      },
-      padding: '0.08',
-    },
-  };
-
   constructor(props) {
     super(props);
     this.state = {
@@ -83,7 +73,8 @@ class StackedBarChart extends React.Component {
         g => getQuantile(g.value, quantiles), // grade[1]=>value
       );
       const sortedquantiles = Array.from(actquantiles.values())
-        .sort((g1, g2) => g2.quantilevalue - g1.quantilevalue);
+        .sort((g1, g2) => g2.quantilevalue - g1.quantilevalue); // Sort the array so we get
+      // the quantiles in the right order
       gradesPerActivityAndQuantile.push({
         activityid: ad.id,
         activityname: ad.name,
@@ -111,7 +102,7 @@ class StackedBarChart extends React.Component {
       .attr('transform', transform()
         .translate(getBarChartMargin().left, getBarChartMargin().top));
 
-    // We add an element of type <g class='layer'...> for each quantile
+    // We add an element of type <g class='layer'...> for each activity
     const activityGroup = graph.selectAll('.layer')
       .data(gradesPerActivityAndQuantile)
       .enter()
@@ -134,7 +125,7 @@ class StackedBarChart extends React.Component {
       .attr('y', (currentQuantile, i, allQuantiles) =>
         scaleY(currentQuantile.gradescount + allQuantiles.reduce(
           (currentHeight, quantileGrades) =>
-            ((currentQuantile.quantilevalue) > parseFloat(select(quantileGrades)
+            ((currentQuantile.quantilevalue) > parseFloat(select(quantileGrades) // Get data stored in the structure
               .datum().quantilevalue) ?
               currentHeight + select(quantileGrades)
                 .datum().gradescount : currentHeight),
