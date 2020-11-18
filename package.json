@@ -96,7 +96,7 @@
     "mini-css-extract-plugin": "^0.5.0",
     "node-sass": "^4.11.0",
     "sass-loader": "^7.1.0",
-    "semantic-release": "^15.13.3",
+    "semantic-release": "^17.2.3",
     "source-map-loader": "^0.2.4",
     "storybook-readme": "^4.0.5",
     "style-loader": "^0.23.1",
